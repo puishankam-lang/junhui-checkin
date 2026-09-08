@@ -3,289 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>俊輝電梯 — 員工報更</title>
+<title>ä¿è¼é»æ¢¯ â å¡å·¥å ±æ´</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'PingFang HK', sans-serif;
-    background: #0d0f12; color: #e8eaf0;
-    min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; padding: 20px 16px 40px;
-  }
-  .header { text-align: center; margin-bottom: 28px; padding-top: 12px; }
-  .logo { font-size: 36px; margin-bottom: 8px; }
-  .company { font-size: 18px; font-weight: 700; color: #f0c000; }
-  .subtitle { font-size: 13px; color: #555d6e; margin-top: 4px; }
-  .card {
-    background: #13161c; border: 1px solid #1e2330;
-    border-radius: 16px; padding: 24px 20px;
-    width: 100%; max-width: 420px; margin-bottom: 16px;
-  }
-  .emp-badge {
-    display: flex; align-items: center; gap: 14px;
-    margin-bottom: 24px; padding: 16px;
-    background: #0d0f12; border-radius: 12px; border: 1px solid #2a3045;
-  }
-  .emp-avatar {
-    width: 52px; height: 52px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; font-weight: 800; flex-shrink: 0;
-  }
-  .emp-name { font-size: 18px; font-weight: 700; }
-  .emp-role { font-size: 12px; color: #555d6e; margin-top: 2px; }
-  .field { margin-bottom: 18px; }
-  .field label {
-    display: block; font-size: 12px; color: #9aa0b4;
-    text-transform: uppercase; letter-spacing: 0.5px;
-    margin-bottom: 8px; font-weight: 600;
-  }
-  .field input, .field select, .field textarea {
-    width: 100%; background: #0d0f12; border: 1px solid #2a3045;
-    border-radius: 10px; color: #e8eaf0; font-size: 16px;
-    padding: 13px 14px; outline: none; transition: border-color 0.2s;
-    -webkit-appearance: none;
-  }
-  .field input:focus, .field select:focus { border-color: #f0c000; }
-  .field textarea { resize: none; height: 80px; }
-  .shift-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .shift-btn {
-    padding: 14px 10px; border-radius: 10px;
-    border: 2px solid #2a3045; background: transparent;
-    color: #9aa0b4; font-size: 14px; font-weight: 600;
-    cursor: pointer; text-align: center; transition: all 0.15s;
-  }
-  .shift-btn.selected { border-color: #f0c000; background: #1a1500; color: #f0c000; }
-  .shift-btn .icon { font-size: 20px; display: block; margin-bottom: 4px; }
-  .submit-btn {
-    width: 100%; background: #f0c000; color: #0d0f12;
-    border: none; border-radius: 12px; padding: 16px;
-    font-size: 17px; font-weight: 800; cursor: pointer;
-    margin-top: 8px; transition: opacity 0.2s;
-  }
-  .submit-btn:active { opacity: 0.85; }
-  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .success { display: none; text-align: center; padding: 40px 20px; }
-  .success .tick { font-size: 64px; margin-bottom: 16px; }
-  .success h2 { font-size: 22px; font-weight: 800; color: #22c55e; margin-bottom: 8px; }
-  .success p { color: #9aa0b4; font-size: 14px; line-height: 1.6; }
-  .success .summary {
-    background: #0d0f12; border: 1px solid #1e2330;
-    border-radius: 12px; padding: 16px; margin: 20px 0; text-align: left;
-  }
-  .summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
-  .summary-row .lbl { color: #555d6e; }
-  .summary-row .val { color: #e8eaf0; font-weight: 600; }
-  .error-screen { display: none; text-align: center; padding: 60px 20px; }
-  .error-screen .icon { font-size: 48px; margin-bottom: 16px; }
-  .error-screen h2 { color: #e05c5c; font-size: 18px; margin-bottom: 8px; }
-  .error-screen p { color: #555d6e; font-size: 14px; }
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #e05c5c; color: #fff; border-radius: 8px;
-    padding: 10px 20px; font-size: 14px; font-weight: 600;
-    opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap;
-  }
-  .toast.show { opacity: 1; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang HK',sans-serif;background:#0d0f12;color:#e8eaf0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 40px}
+.company{font-size:17px;font-weight:700;color:#f0c000;text-align:center;margin-bottom:4px}
+.subtitle{font-size:12px;color:#555d6e;text-align:center;margin-bottom:24px}
+.card{background:#13161c;border:1px solid #1e2330;border-radius:14px;padding:20px;width:100%;max-width:420px;margin-bottom:14px}
+.badge{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:14px;background:#0d0f12;border-radius:10px;border:1px solid #2a3045}
+.avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0}
+.lbl{display:block;font-size:11px;color:#9aa0b4;text-transform:uppercase;margin-bottom:6px;font-weight:600}
+.inp{width:100%;background:#0d0f12;border:1px solid #2a3045;border-radius:10px;color:#e8eaf0;font-size:16px;padding:12px 14px;outline:none;-webkit-appearance:none;margin-bottom:14px}
+.inp:focus{border-color:#f0c000}
+.shifts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.shift{padding:14px 10px;border-radius:10px;border:2px solid #2a3045;background:transparent;color:#9aa0b4;font-size:14px;font-weight:600;cursor:pointer;text-align:center}
+.shift.sel{border-color:#f0c000;background:#1a1500;color:#f0c000}
+.shift-icon{font-size:20px;display:block;margin-bottom:4px}
+textarea.inp{resize:none;height:80px}
+.btn{width:100%;background:#f0c000;color:#0d0f12;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:800;cursor:pointer;margin-top:4px}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.success{text-align:center;padding:32px 16px}
+.sum{background:#0d0f12;border:1px solid #1e2330;border-radius:10px;padding:14px;margin:14px 0;text-align:left}
+.row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid #1e2330}
+.row:last-child{border-bottom:none}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#e05c5c;color:#fff;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:999}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
+<div style="font-size:32px;text-align:center;margin-bottom:8px;padding-top:12px">ðï¸</div>
+<div class="company">ä¿è¼é»æ¢¯å·¥ç¨æéå¬å¸</div>
+<div class="subtitle">å¡å·¥èªå©å ±æ´</div>
 
-<div class="header">
-  <div class="logo">&#x1F3D7;</div>
-  <div class="company">巨揚工程有限公司</div>
-  <div class="subtitle">員工自助報更</div>
+<div id="err" style="display:none;text-align:center;padding:60px 20px">
+  <div style="font-size:48px;margin-bottom:16px">â ï¸</div>
+  <div style="font-size:18px;font-weight:700;color:#e05c5c;margin-bottom:8px">é£çµç¡æ</div>
+  <div style="color:#555d6e;font-size:14px">è«åä¸»ç®¡ç´¢åæ­£ç¢ºåå ±æ´é£çµ</div>
 </div>
 
-<div class="error-screen" id="errorScreen">
-  <div class="icon">⚠️</div>
-  <h2>連結無效</h2>
-  <p>請向主管索取正確嘅報更連結</p>
-</div>
-
-<div class="card" id="mainCard" style="display:none">
-  <div class="emp-badge" id="empBadge">
-    <div class="emp-avatar" id="empAvatar">?</div>
-    <div>
-      <div class="emp-name" id="empName">載入中...</div>
-      <div class="emp-role" id="empRole">電梯技工</div>
+<div id="main" style="display:none;width:100%;max-width:420px">
+  <div class="card">
+    <div class="badge">
+      <div class="avatar" id="av">?</div>
+      <div>
+        <div style="font-size:17px;font-weight:700" id="nm">è¼å¥ä¸­...</div>
+        <div style="font-size:11px;color:#555d6e;margin-top:2px">é»æ¢¯æå·¥</div>
+      </div>
     </div>
-  </div>
-  <div class="field">
-    <label>📅 日期</label>
-    <input type="date" id="dateInput">
-  </div>
-  <div class="field">
-    <label>⏰ 更期</label>
-    <div class="shift-grid">
-      <button class="shift-btn" data-shift="早更" onclick="selectShift(this)"><span class="icon">🌅</span>早更</button>
-      <button class="shift-btn" data-shift="夜更" onclick="selectShift(this)"><span class="icon">🌙</span>夜更</button>
-      <button class="shift-btn" data-shift="假日更" onclick="selectShift(this)"><span class="icon">🎉</span>假日更</button>
-      <button class="shift-btn" data-shift="散工" onclick="selectShift(this)"><span class="icon">💼</span>散工</button>
+    <label class="lbl">æ¥æ</label>
+    <input type="date" class="inp" id="dt">
+    <label class="lbl">æ´æ</label>
+    <div class="shifts">
+      <button class="shift" data-v="æ©æ´" onclick="sel(this)"><span class="shift-icon">ð</span>æ©æ´</button>
+      <button class="shift" data-v="å¤æ´" onclick="sel(this)"><span class="shift-icon">ð</span>å¤æ´</button>
+      <button class="shift" data-v="åæ¥æ´" onclick="sel(this)"><span class="shift-icon">ð</span>åæ¥æ´</button>
+      <button class="shift" data-v="æ£å·¥" onclick="sel(this)"><span class="shift-icon">ð¼</span>æ£å·¥</button>
     </div>
+    <label class="lbl">ä¸ç­æé</label>
+    <input type="time" class="inp" id="tm">
+    <label class="lbl">åè¨»ï¼å¯é¸ï¼</label>
+    <textarea class="inp" id="rmk" placeholder="ä¾ï¼å·¥ä½å§å®¹ãç¹å¥ææ³..."></textarea>
+    <button class="btn" id="sbtn" onclick="submit()" disabled>ç¢ºèªå ±æ´</button>
   </div>
-  <div class="field">
-    <label>🕐 上班時間</label>
-    <input type="time" id="timeInput" value="08:00">
-  </div>
-  <div class="field">
-    <label>📝 備註（可選）</label>
-    <textarea id="remarkInput" placeholder="例：工作內容、特別情況..."></textarea>
-  </div>
-  <button class="submit-btn" id="submitBtn" onclick="submitReport()">✅ 確認報更</button>
 </div>
 
-<div class="card success" id="successScreen">
-  <div class="tick">✅</div>
-  <h2>報更成功！</h2>
-  <div class="summary" id="summaryBox"></div>
-  <p>已記錄到系統，主管可以喺考勤月曆睇到</p>
+<div id="done" style="display:none;width:100%;max-width:420px">
+  <div class="card success">
+    <div style="font-size:56px;margin-bottom:12px">â</div>
+    <h2 style="font-size:20px;font-weight:800;color:#22c55e;margin-bottom:8px">å ±æ´æåï¼</h2>
+    <div class="sum" id="sumbox"></div>
+    <p style="color:#9aa0b4;font-size:13px">å·²è¨éå°ç³»çµ±ï¼ä¸»ç®¡å¯ä»¥åºèå¤ææçå°</p>
+  </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL = "https://fyxvejnvzflxppqrhlzt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_k9GEEEmqiYnuBPFqsQuvIQ_YGjweOSh";
-
-// ── 真實 Supabase 員工 ID ──
+const SB_URL='https://fyxvejnvzflxppqrhlzt.supabase.co';
+const SB_KEY='sb_publishable_k9GEEEmqiYnuBPFqsQuvIQ_YGjweOSh';
 const EMPLOYEES = [
-  { id:26, name:"姚奇敏", phone:"52392789", color:"#FF6B1A" },
-  { id:28, name:"賴偉志", phone:"91498681", color:"#22C55E" },
-  { id:29, name:"韓小錦", phone:"57631557", color:"#60A5FA" },
-  { id:30, name:"彭金花", phone:"93405725", color:"#A78BFA" },
-  { id:31, name:"李文彪", phone:"63573726", color:"#FB923C" },
-  { id:32, name:"莫家文", phone:"65704790", color:"#F43F5E" },
-  { id:33, name:"陳文軒", phone:"51115103", color:"#06B6D4" },
-  { id:43, name:"Simon 曾遠宗", phone:"93408961", color:"#84CC16" },
-  { id:44, name:"Kim",   phone:"66438119", color:"#E879F9" },
-  { id:45, name:"耿華成", phone:"95615270", color:"#F0C000" },
-  { id:46, name:"譚敏銳", phone:"54201997", color:"#22C55E" },
-  { id:47, name:"吳紹鵬", phone:"56111810", color:"#60A5FA" },
-  { id:48, name:"蔡貴明", phone:"59383172", color:"#A78BFA" },
-  { id:51, name:"李國森", phone:"68908731", color:"#FB923C" },
+  {id:26,name:"å§å¥æ",phone:"52392789",color:"#FF6B1A"},
+  {id:28,name:"è³´åå¿",phone:"91498681",color:"#22C55E"},
+  {id:29,name:"éå°é¦",phone:"57631557",color:"#60A5FA"},
+  {id:30,name:"å½­éè±",phone:"93405725",color:"#A78BFA"},
+  {id:31,name:"ææå½ª",phone:"63573726",color:"#FB923C"},
+  {id:32,name:"è«å®¶æ",phone:"65704790",color:"#F43F5E"},
+  {id:33,name:"é³æè»",phone:"51115103",color:"#06B6D4"},
+  {id:43,name:"Simon æ¾é å®",phone:"93408961",color:"#84CC16"},
+  {id:44,name:"Kim",phone:"66438119",color:"#E879F9"},
+  {id:45,name:"è¿è¯æ",phone:"95615270",color:"#F0C000"},
+  {id:46,name:"è­æé³",phone:"54201997",color:"#22C55E"},
+  {id:47,name:"å³ç´¹éµ¬",phone:"56111810",color:"#60A5FA"},
+  {id:48,name:"è¡è²´æ",phone:"59383172",color:"#A78BFA"},
+  {id:51,name:"æåæ£®",phone:"68908731",color:"#FB923C"},
+  {id:52,name:"KK mario",phone:"96998241",color:"#FF6B1A"},
 ];
 
-let currentEmp = null;
-let selectedShift = null;
+// Robust emp ID extraction - handles ?emp=, #emp=, %23emp=
+var m = (location.search+location.hash+decodeURIComponent(location.href)).match(/emp=(\d+)/);
+var emp = m ? EMPLOYEES.find(function(e){return e.id===parseInt(m[1]);}) : null;
+var shift = null;
 
-function init() {
-  const params = new URLSearchParams(window.location.hash.slice(1));
-  const empId = parseInt(params.get('emp'));
-  const emp = EMPLOYEES.find(e => e.id === empId);
-
-  if (!emp) {
-    document.getElementById('errorScreen').style.display = 'block';
-    return;
-  }
-
-  currentEmp = emp;
-  document.getElementById('mainCard').style.display = 'block';
-  document.getElementById('empName').textContent = emp.name;
-  document.getElementById('empRole').textContent = '電梯技工';
-
-  const av = document.getElementById('empAvatar');
-  av.textContent = emp.name[0];
-  av.style.background = emp.color + '33';
-  av.style.color = emp.color;
-  av.style.border = '2px solid ' + emp.color + '66';
-
-  // Default date = today HK time
-  const now = new Date();
-  const hkOffset = 8 * 60;
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  const hkTime = new Date(utc + hkOffset * 60000);
-  const yyyy = hkTime.getFullYear();
-  const mm = String(hkTime.getMonth()+1).padStart(2,'0');
-  const dd = String(hkTime.getDate()).padStart(2,'0');
-  document.getElementById('dateInput').value = `${yyyy}-${mm}-${dd}`;
-
-  const hh = String(hkTime.getHours()).padStart(2,'0');
-  const min = String(hkTime.getMinutes()).padStart(2,'0');
-  document.getElementById('timeInput').value = `${hh}:${min}`;
+if (!emp) {
+  document.getElementById('err').style.display='block';
+} else {
+  document.getElementById('main').style.display='block';
+  document.getElementById('nm').textContent=emp.name;
+  var av=document.getElementById('av');
+  av.textContent=emp.name[0];
+  av.style.background=emp.color+'33';
+  av.style.color=emp.color;
+  av.style.border='2px solid '+emp.color+'66';
+  // HK date/time
+  var hk=new Date(Date.now()+8*3600000);
+  document.getElementById('dt').value=hk.toISOString().slice(0,10);
+  document.getElementById('tm').value=hk.toISOString().slice(11,16);
 }
 
-function selectShift(btn) {
-  document.querySelectorAll('.shift-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  selectedShift = btn.dataset.shift;
+function sel(btn){
+  document.querySelectorAll('.shift').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel'); shift=btn.dataset.v;
+  document.getElementById('sbtn').disabled=false;
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2500);
 }
 
-async function submitReport() {
-  if (!selectedShift) { showToast('⚠️ 請選擇更期'); return; }
-  const date = document.getElementById('dateInput').value;
-  const time = document.getElementById('timeInput').value;
-  const remark = document.getElementById('remarkInput').value.trim();
-  if (!date) { showToast('⚠️ 請填寫日期'); return; }
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = '提交中...';
-
-  const payload = {
-    employee_name: currentEmp.name,
-    date: date,
-    shift_type: selectedShift,
-    clock_in: date + 'T' + time + ':00+08:00',
-    notes: remark || null,
-    status: 'present',
-  };
-
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/attendance`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-
-    document.getElementById('mainCard').style.display = 'none';
-    document.getElementById('successScreen').style.display = 'block';
-
-    const shiftLabels = { '早更':'🌅 早更','夜更':'🌙 夜更','假日更':'🎉 假日更','散工':'💼 散工' };
-    document.getElementById('summaryBox').innerHTML = `
-      <div class="summary-row"><span class="lbl">姓名</span><span class="val">${currentEmp.name}</span></div>
-      <div class="summary-row"><span class="lbl">日期</span><span class="val">${date}</span></div>
-      <div class="summary-row"><span class="lbl">更期</span><span class="val">${shiftLabels[selectedShift]}</span></div>
-      <div class="summary-row"><span class="lbl">上班時間</span><span class="val">${time}</span></div>
-      ${remark ? `<div class="summary-row"><span class="lbl">備註</span><span class="val">${remark}</span></div>` : ''}
-    `;
-  } catch(e) {
-    btn.disabled = false;
-    btn.textContent = '✅ 確認報更';
-    showToast('❌ 提交失敗，請重試');
-  }
-}
-
-
-const SB_URL='https://fyxvejnvzflxppqrhlzt.supabase.co',SB_KEY='sb_publishable_k9GEEEmqiYnuBPFqsQuvIQ_YGjweOSh';
-const COLORS=['#FF6B1A', '#22C55E', '#60A5FA', '#A78BFA', '#FB923C', '#F43F5E', '#06B6D4', '#84CC16', '#E879F9', '#F0C000', '#22C55E', '#60A5FA', '#A78BFA', '#FB923C', '#FF6B1A', '#22C55E'];
-let EMPLOYEES=[];
-
-async function loadEmployees(){
+async function submit(){
+  if(!shift){toast('è«é¸ææ´æ');return;}
+  var btn=document.getElementById('sbtn');
+  btn.disabled=true;btn.textContent='æäº¤ä¸­...';
+  var dt=document.getElementById('dt').value;
+  var tm=document.getElementById('tm').value;
+  var rmk=document.getElementById('rmk').value.trim();
   try{
-    const r=await fetch(`${SB_URL}/rest/v1/employees?select=id,name,phone&order=id.asc`,
-      {headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}});
-    const data=await r.json();
-    if(Array.isArray(data)){
-      EMPLOYEES=data.map((e,i)=>({id:e.id,name:e.name,phone:e.phone||'',color:COLORS[i%COLORS.length]}));
-    }
-  }catch(e){}
-  init();
+    var r=await fetch(SB_URL+'/rest/v1/attendance',{
+      method:'POST',
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({employee_name:emp.name,date:dt,shift_type:shift,clock_in:dt+'T'+tm+':00+08:00',notes:rmk||null,status:'present'})
+    });
+    if(!r.ok)throw new Error();
+    document.getElementById('main').style.display='none';
+    document.getElementById('done').style.display='block';
+    var labels={'æ©æ´':'æ©æ´','å¤æ´':'å¤æ´','åæ¥æ´':'åæ¥æ´','æ£å·¥':'æ£å·¥'};
+    document.getElementById('sumbox').innerHTML=
+      '<div class="row"><span style="color:#555d6e">å§å</span><span style="font-weight:600">'+emp.name+'</span></div>'+
+      '<div class="row"><span style="color:#555d6e">æ¥æ</span><span style="font-weight:600">'+dt+'</span></div>'+
+      '<div class="row"><span style="color:#555d6e">æ´æ</span><span style="font-weight:600">'+shift+'</span></div>'+
+      '<div class="row"><span style="color:#555d6e">ä¸ç­æé</span><span style="font-weight:600">'+tm+'</span></div>'+
+      (rmk?'<div class="row"><span style="color:#555d6e">åè¨»</span><span style="font-weight:600">'+rmk+'</span></div>':'');
+  }catch(e){
+    btn.disabled=false;btn.textContent='ç¢ºèªå ±æ´';
+    toast('æäº¤å¤±æï¼è«éè©¦');
+  }
 }
-loadEmployees();
 </script>
 </body>
 </html>

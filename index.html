@@ -269,7 +269,23 @@ async function submitReport() {
   }
 }
 
-init();
+
+const SB_URL='https://fyxvejnvzflxppqrhlzt.supabase.co',SB_KEY='sb_publishable_k9GEEEmqiYnuBPFqsQuvIQ_YGjweOSh';
+const COLORS=['#FF6B1A', '#22C55E', '#60A5FA', '#A78BFA', '#FB923C', '#F43F5E', '#06B6D4', '#84CC16', '#E879F9', '#F0C000', '#22C55E', '#60A5FA', '#A78BFA', '#FB923C', '#FF6B1A', '#22C55E'];
+let EMPLOYEES=[];
+
+async function loadEmployees(){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/employees?select=id,name,phone&order=id.asc`,
+      {headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}});
+    const data=await r.json();
+    if(Array.isArray(data)){
+      EMPLOYEES=data.map((e,i)=>({id:e.id,name:e.name,phone:e.phone||'',color:COLORS[i%COLORS.length]}));
+    }
+  }catch(e){}
+  init();
+}
+loadEmployees();
 </script>
 </body>
 </html>

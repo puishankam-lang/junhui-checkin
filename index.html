@@ -169,7 +169,7 @@ let currentEmp = null;
 let selectedShift = null;
 
 function init() {
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(window.location.hash.slice(1));
   const empId = parseInt(params.get('emp'));
   const emp = EMPLOYEES.find(e => e.id === empId);
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>ä¿è¼é»æ¢¯ â å¡å·¥å ±æ´</title>
+<title>俊輝電梯 — 員工報更</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang HK',sans-serif;background:#0d0f12;color:#e8eaf0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 40px}
@@ -31,14 +31,14 @@ textarea.inp{resize:none;height:80px}
 </style>
 </head>
 <body>
-<div style="font-size:32px;text-align:center;margin-bottom:8px;padding-top:12px">ðï¸</div>
-<div class="company">ä¿è¼é»æ¢¯å·¥ç¨æéå¬å¸</div>
-<div class="subtitle">å¡å·¥èªå©å ±æ´</div>
+<div style="font-size:32px;text-align:center;margin-bottom:8px;padding-top:12px">🏗️</div>
+<div class="company">俊輝電梯工程有限公司</div>
+<div class="subtitle">員工自助報更</div>
 
 <div id="err" style="display:none;text-align:center;padding:60px 20px">
-  <div style="font-size:48px;margin-bottom:16px">â ï¸</div>
-  <div style="font-size:18px;font-weight:700;color:#e05c5c;margin-bottom:8px">é£çµç¡æ</div>
-  <div style="color:#555d6e;font-size:14px">è«åä¸»ç®¡ç´¢åæ­£ç¢ºåå ±æ´é£çµ</div>
+  <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+  <div style="font-size:18px;font-weight:700;color:#e05c5c;margin-bottom:8px">連結無效</div>
+  <div style="color:#555d6e;font-size:14px">請向主管索取正確嘅報更連結</div>
 </div>
 
 <div id="main" style="display:none;width:100%;max-width:420px">
@@ -46,33 +46,33 @@ textarea.inp{resize:none;height:80px}
     <div class="badge">
       <div class="avatar" id="av">?</div>
       <div>
-        <div style="font-size:17px;font-weight:700" id="nm">è¼å¥ä¸­...</div>
-        <div style="font-size:11px;color:#555d6e;margin-top:2px">é»æ¢¯æå·¥</div>
+        <div style="font-size:17px;font-weight:700" id="nm">載入中...</div>
+        <div style="font-size:11px;color:#555d6e;margin-top:2px">電梯技工</div>
       </div>
     </div>
-    <label class="lbl">æ¥æ</label>
+    <label class="lbl">日期</label>
     <input type="date" class="inp" id="dt">
-    <label class="lbl">æ´æ</label>
+    <label class="lbl">更期</label>
     <div class="shifts">
-      <button class="shift" data-v="æ©æ´" onclick="sel(this)"><span class="shift-icon">ð</span>æ©æ´</button>
-      <button class="shift" data-v="å¤æ´" onclick="sel(this)"><span class="shift-icon">ð</span>å¤æ´</button>
-      <button class="shift" data-v="åæ¥æ´" onclick="sel(this)"><span class="shift-icon">ð</span>åæ¥æ´</button>
-      <button class="shift" data-v="æ£å·¥" onclick="sel(this)"><span class="shift-icon">ð¼</span>æ£å·¥</button>
+      <button class="shift" data-v="早更" onclick="sel(this)"><span class="shift-icon">🌅</span>早更</button>
+      <button class="shift" data-v="夜更" onclick="sel(this)"><span class="shift-icon">🌙</span>夜更</button>
+      <button class="shift" data-v="假日更" onclick="sel(this)"><span class="shift-icon">🎉</span>假日更</button>
+      <button class="shift" data-v="散工" onclick="sel(this)"><span class="shift-icon">💼</span>散工</button>
     </div>
-    <label class="lbl">ä¸ç­æé</label>
+    <label class="lbl">上班時間</label>
     <input type="time" class="inp" id="tm">
-    <label class="lbl">åè¨»ï¼å¯é¸ï¼</label>
-    <textarea class="inp" id="rmk" placeholder="ä¾ï¼å·¥ä½å§å®¹ãç¹å¥ææ³..."></textarea>
-    <button class="btn" id="sbtn" onclick="submit()" disabled>ç¢ºèªå ±æ´</button>
+    <label class="lbl">備註（可選）</label>
+    <textarea class="inp" id="rmk" placeholder="例：工作內容、特別情況..."></textarea>
+    <button class="btn" id="sbtn" onclick="submit()" disabled>確認報更</button>
   </div>
 </div>
 
 <div id="done" style="display:none;width:100%;max-width:420px">
   <div class="card success">
-    <div style="font-size:56px;margin-bottom:12px">â</div>
-    <h2 style="font-size:20px;font-weight:800;color:#22c55e;margin-bottom:8px">å ±æ´æåï¼</h2>
+    <div style="font-size:56px;margin-bottom:12px">✅</div>
+    <h2 style="font-size:20px;font-weight:800;color:#22c55e;margin-bottom:8px">報更成功！</h2>
     <div class="sum" id="sumbox"></div>
-    <p style="color:#9aa0b4;font-size:13px">å·²è¨éå°ç³»çµ±ï¼ä¸»ç®¡å¯ä»¥åºèå¤ææçå°</p>
+    <p style="color:#9aa0b4;font-size:13px">已記錄到系統，主管可以喺考勤月曆睇到</p>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -81,20 +81,20 @@ textarea.inp{resize:none;height:80px}
 const SB_URL='https://fyxvejnvzflxppqrhlzt.supabase.co';
 const SB_KEY='sb_publishable_k9GEEEmqiYnuBPFqsQuvIQ_YGjweOSh';
 const EMPLOYEES = [
-  {id:26,name:"å§å¥æ",phone:"52392789",color:"#FF6B1A"},
-  {id:28,name:"è³´åå¿",phone:"91498681",color:"#22C55E"},
-  {id:29,name:"éå°é¦",phone:"57631557",color:"#60A5FA"},
-  {id:30,name:"å½­éè±",phone:"93405725",color:"#A78BFA"},
-  {id:31,name:"ææå½ª",phone:"63573726",color:"#FB923C"},
-  {id:32,name:"è«å®¶æ",phone:"65704790",color:"#F43F5E"},
-  {id:33,name:"é³æè»",phone:"51115103",color:"#06B6D4"},
-  {id:43,name:"Simon æ¾é å®",phone:"93408961",color:"#84CC16"},
+  {id:26,name:"姚奇敏",phone:"52392789",color:"#FF6B1A"},
+  {id:28,name:"賴偉志",phone:"91498681",color:"#22C55E"},
+  {id:29,name:"韓小錦",phone:"57631557",color:"#60A5FA"},
+  {id:30,name:"彭金花",phone:"93405725",color:"#A78BFA"},
+  {id:31,name:"李文彪",phone:"63573726",color:"#FB923C"},
+  {id:32,name:"莫家文",phone:"65704790",color:"#F43F5E"},
+  {id:33,name:"陳文軒",phone:"51115103",color:"#06B6D4"},
+  {id:43,name:"Simon 曾遠宗",phone:"93408961",color:"#84CC16"},
   {id:44,name:"Kim",phone:"66438119",color:"#E879F9"},
-  {id:45,name:"è¿è¯æ",phone:"95615270",color:"#F0C000"},
-  {id:46,name:"è­æé³",phone:"54201997",color:"#22C55E"},
-  {id:47,name:"å³ç´¹éµ¬",phone:"56111810",color:"#60A5FA"},
-  {id:48,name:"è¡è²´æ",phone:"59383172",color:"#A78BFA"},
-  {id:51,name:"æåæ£®",phone:"68908731",color:"#FB923C"},
+  {id:45,name:"耿華成",phone:"95615270",color:"#F0C000"},
+  {id:46,name:"譚敏銳",phone:"54201997",color:"#22C55E"},
+  {id:47,name:"吳紹鵬",phone:"56111810",color:"#60A5FA"},
+  {id:48,name:"蔡貴明",phone:"59383172",color:"#A78BFA"},
+  {id:51,name:"李國森",phone:"68908731",color:"#FB923C"},
   {id:52,name:"KK mario",phone:"96998241",color:"#FF6B1A"},
 ];
 
@@ -132,9 +132,9 @@ function toast(msg){
 }
 
 async function submit(){
-  if(!shift){toast('è«é¸ææ´æ');return;}
+  if(!shift){toast('請選擇更期');return;}
   var btn=document.getElementById('sbtn');
-  btn.disabled=true;btn.textContent='æäº¤ä¸­...';
+  btn.disabled=true;btn.textContent='提交中...';
   var dt=document.getElementById('dt').value;
   var tm=document.getElementById('tm').value;
   var rmk=document.getElementById('rmk').value.trim();
@@ -147,16 +147,16 @@ async function submit(){
     if(!r.ok)throw new Error();
     document.getElementById('main').style.display='none';
     document.getElementById('done').style.display='block';
-    var labels={'æ©æ´':'æ©æ´','å¤æ´':'å¤æ´','åæ¥æ´':'åæ¥æ´','æ£å·¥':'æ£å·¥'};
+    var labels={'早更':'早更','夜更':'夜更','假日更':'假日更','散工':'散工'};
     document.getElementById('sumbox').innerHTML=
-      '<div class="row"><span style="color:#555d6e">å§å</span><span style="font-weight:600">'+emp.name+'</span></div>'+
-      '<div class="row"><span style="color:#555d6e">æ¥æ</span><span style="font-weight:600">'+dt+'</span></div>'+
-      '<div class="row"><span style="color:#555d6e">æ´æ</span><span style="font-weight:600">'+shift+'</span></div>'+
-      '<div class="row"><span style="color:#555d6e">ä¸ç­æé</span><span style="font-weight:600">'+tm+'</span></div>'+
-      (rmk?'<div class="row"><span style="color:#555d6e">åè¨»</span><span style="font-weight:600">'+rmk+'</span></div>':'');
+      '<div class="row"><span style="color:#555d6e">姓名</span><span style="font-weight:600">'+emp.name+'</span></div>'+
+      '<div class="row"><span style="color:#555d6e">日期</span><span style="font-weight:600">'+dt+'</span></div>'+
+      '<div class="row"><span style="color:#555d6e">更期</span><span style="font-weight:600">'+shift+'</span></div>'+
+      '<div class="row"><span style="color:#555d6e">上班時間</span><span style="font-weight:600">'+tm+'</span></div>'+
+      (rmk?'<div class="row"><span style="color:#555d6e">備註</span><span style="font-weight:600">'+rmk+'</span></div>':'');
   }catch(e){
-    btn.disabled=false;btn.textContent='ç¢ºèªå ±æ´';
-    toast('æäº¤å¤±æï¼è«éè©¦');
+    btn.disabled=false;btn.textContent='確認報更';
+    toast('提交失敗，請重試');
   }
 }
 </script>

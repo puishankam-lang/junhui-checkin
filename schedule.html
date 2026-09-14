@@ -66,6 +66,25 @@ tr:last-child td{border-bottom:none}
   </div>
 
   <div class="card">
+    <div class="section-title">🏗️ 施工進度日報 — 連結產生器</div>
+    <div class="row">
+      <div class="field">
+        <label class="lbl">員工</label>
+        <select id="pgEmpSelect"><option value="">載入中...</option></select>
+      </div>
+      <div class="field">
+        <label class="lbl">地盤</label>
+        <select id="pgProjSelect"><option value="">載入中...</option></select>
+      </div>
+    </div>
+    <button class="btn" id="pgGenBtn" onclick="genProgressLink()" disabled>產生連結</button>
+    <div id="pgResult" style="margin-top:12px;display:none">
+      <div style="background:#0d0f12;border:1px solid #2a3045;border-radius:8px;padding:10px 12px;font-size:12px;color:#9aa0b4;word-break:break-all;margin-bottom:8px" id="pgUrlText"></div>
+      <button class="copy-btn" style="padding:6px 12px;font-size:12px" onclick="copyProgressLink(this)">複製連結</button>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="section-title" id="listTitle">📅 排更列表</div>
     <div class="row" style="margin-bottom:6px">
       <div class="field" style="min-width:140px;flex:0 0 160px">
@@ -109,6 +128,11 @@ async function loadEmployees() {
   sel.innerHTML = '<option value="">請選擇員工</option>' +
     employees.map(function(e, i) { return '<option value="' + e.id + '">' + e.name + '</option>'; }).join('');
   sel.onchange = updateAddState;
+
+  const pgSel = document.getElementById('pgEmpSelect');
+  pgSel.innerHTML = '<option value="">請選擇員工</option>' +
+    employees.map(function(e) { return '<option value="' + e.id + '">' + e.name + '</option>'; }).join('');
+  pgSel.onchange = updatePgState;
 }
 
 async function loadProjects() {
@@ -122,6 +146,11 @@ async function loadProjects() {
   sel.innerHTML = '<option value="">請選擇地盤</option>' +
     projects.map(function(p) { return '<option value="' + p.id + '">' + p.name + '</option>'; }).join('');
   sel.onchange = updateAddState;
+
+  const pgSel = document.getElementById('pgProjSelect');
+  pgSel.innerHTML = '<option value="">請選擇地盤</option>' +
+    projects.map(function(p) { return '<option value="' + p.id + '">' + p.name + '</option>'; }).join('');
+  pgSel.onchange = updatePgState;
 }
 
 function updateAddState() {
@@ -234,6 +263,31 @@ async function delSchedule(id) {
   } catch (e) {
     toast('❌ 刪除失敗', true);
   }
+}
+
+function updatePgState() {
+  const emp = document.getElementById('pgEmpSelect').value;
+  const proj = document.getElementById('pgProjSelect').value;
+  document.getElementById('pgGenBtn').disabled = !(emp && proj);
+  document.getElementById('pgResult').style.display = 'none';
+}
+
+function genProgressLink() {
+  const empId = document.getElementById('pgEmpSelect').value;
+  const projId = document.getElementById('pgProjSelect').value;
+  const empNm = empName(parseInt(empId));
+  const url = 'https://junhui-progress.vercel.app/#project=' + projId + '&emp=' + encodeURIComponent(empNm);
+  document.getElementById('pgUrlText').textContent = url;
+  document.getElementById('pgResult').style.display = 'block';
+}
+
+function copyProgressLink(btn) {
+  const url = document.getElementById('pgUrlText').textContent;
+  navigator.clipboard.writeText(url).then(function() {
+    const orig = btn.textContent;
+    btn.textContent = '已複製 ✓';
+    setTimeout(function() { btn.textContent = orig; }, 1500);
+  }).catch(function() { toast('複製失敗，請手動複製', true); });
 }
 
 function toast(msg, isErr) {

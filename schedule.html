@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>俊輝電梯 — 排更管理</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang HK',sans-serif;background:#0d0f12;color:#e8eaf0;min-height:100vh;padding:20px 16px 60px}
+.wrap{max-width:640px;margin:0 auto}
+.header{text-align:center;margin-bottom:24px;padding-top:12px}
+.company{font-size:17px;font-weight:700;color:#f0c000}
+.subtitle{font-size:12px;color:#555d6e;margin-top:3px}
+.card{background:#13161c;border:1px solid #1e2330;border-radius:14px;padding:20px;margin-bottom:16px}
+.section-title{font-size:12px;font-weight:700;color:#f0c000;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px}
+.row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.field{flex:1;min-width:160px}
+.lbl{display:block;font-size:11px;color:#9aa0b4;margin-bottom:6px;font-weight:600}
+select,input[type=date]{width:100%;background:#0d0f12;border:1px solid #2a3045;border-radius:10px;color:#e8eaf0;font-size:15px;padding:11px 12px;outline:none}
+select:focus,input:focus{border-color:#f0c000}
+.btn{background:#f0c000;color:#0d0f12;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:800;cursor:pointer}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn-ghost{background:#1e2330;color:#9aa0b4;border:1px solid #2a3045;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th{text-align:left;font-size:11px;color:#555d6e;font-weight:600;padding:8px 10px;border-bottom:1px solid #2a3045}
+td{padding:10px;font-size:13px;border-bottom:1px solid #1a1e28}
+tr:last-child td{border-bottom:none}
+.emp-cell{display:flex;align-items:center;gap:8px}
+.avatar-sm{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.proj-select{min-width:180px}
+.link-cell{font-size:11px}
+.copy-btn{background:none;border:1px solid #2a3045;color:#60a5fa;border-radius:5px;padding:4px 8px;font-size:11px;cursor:pointer}
+.del-btn{background:none;border:1px solid #e05c5c44;color:#e05c5c;border-radius:5px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px}
+.empty{text-align:center;color:#3a4255;font-size:13px;padding:30px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#22c55e;color:#0d0f12;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:999}
+.toast.show{opacity:1}
+.toast.err{background:#e05c5c;color:#fff}
+.no-proj{color:#555d6e;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div style="font-size:32px;margin-bottom:6px">📋</div>
+    <div class="company">巨揚工程有限公司</div>
+    <div class="subtitle">排更管理｜公司內部使用</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">➕ 新增排更</div>
+    <div class="row">
+      <div class="field">
+        <label class="lbl">員工</label>
+        <select id="empSelect"><option value="">載入中...</option></select>
+      </div>
+      <div class="field">
+        <label class="lbl">地盤</label>
+        <select id="projSelect"><option value="">載入中...</option></select>
+      </div>
+      <div class="field" style="min-width:140px;flex:0 0 140px">
+        <label class="lbl">日期</label>
+        <input type="date" id="dateInput">
+      </div>
+    </div>
+    <button class="btn" id="addBtn" onclick="addSchedule()" disabled>排定</button>
+  </div>
+
+  <div class="card">
+    <div class="section-title" id="listTitle">📅 排更列表</div>
+    <div class="row" style="margin-bottom:6px">
+      <div class="field" style="min-width:140px;flex:0 0 160px">
+        <input type="date" id="filterDate" onchange="loadSchedules()">
+      </div>
+      <button class="btn-ghost" onclick="filterToday()">今日</button>
+    </div>
+    <div id="listBox"><div class="empty">載入中...</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL = 'https://fyxvejnvzflxppqrhlzt.supabase.co';
+const SB_KEY = 'sb_publishable_k9GEEEmqiYnuBPFqsQuvIQ_YGjweOSh';
+const COLORS = ['#FF6B1A','#22C55E','#60A5FA','#A78BFA','#FB923C','#F43F5E','#06B6D4','#84CC16','#E879F9','#F0C000'];
+
+let employees = [];
+let projects = [];
+
+function hkToday() {
+  return new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+}
+
+async function init() {
+  document.getElementById('dateInput').value = hkToday();
+  document.getElementById('filterDate').value = hkToday();
+  await Promise.all([loadEmployees(), loadProjects()]);
+  loadSchedules();
+}
+
+async function loadEmployees() {
+  try {
+    const resp = await fetch(SB_URL + '/rest/v1/employees?select=id,name&order=name.asc', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    employees = resp.ok ? await resp.json() : [];
+  } catch (e) { employees = []; }
+  const sel = document.getElementById('empSelect');
+  sel.innerHTML = '<option value="">請選擇員工</option>' +
+    employees.map(function(e, i) { return '<option value="' + e.id + '">' + e.name + '</option>'; }).join('');
+  sel.onchange = updateAddState;
+}
+
+async function loadProjects() {
+  try {
+    const resp = await fetch(SB_URL + '/rest/v1/projects?select=id,name,status&order=name.asc&status=neq.archived', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    projects = resp.ok ? await resp.json() : [];
+  } catch (e) { projects = []; }
+  const sel = document.getElementById('projSelect');
+  sel.innerHTML = '<option value="">請選擇地盤</option>' +
+    projects.map(function(p) { return '<option value="' + p.id + '">' + p.name + '</option>'; }).join('');
+  sel.onchange = updateAddState;
+}
+
+function updateAddState() {
+  const emp = document.getElementById('empSelect').value;
+  const proj = document.getElementById('projSelect').value;
+  document.getElementById('addBtn').disabled = !(emp && proj);
+}
+
+function empColor(id) {
+  const idx = employees.findIndex(function(e) { return e.id === id; });
+  return COLORS[idx >= 0 ? idx % COLORS.length : 0];
+}
+function empName(id) {
+  const e = employees.find(function(x) { return x.id === id; });
+  return e ? e.name : ('員工#' + id);
+}
+function projName(id) {
+  const p = projects.find(function(x) { return x.id === id; });
+  return p ? p.name : ('地盤#' + id);
+}
+
+async function addSchedule() {
+  const btn = document.getElementById('addBtn');
+  const empId = parseInt(document.getElementById('empSelect').value);
+  const projId = parseInt(document.getElementById('projSelect').value);
+  const date = document.getElementById('dateInput').value;
+  if (!empId || !projId || !date) return;
+
+  btn.disabled = true; btn.textContent = '處理中...';
+  try {
+    // 用 upsert：同一人同一日重複排，就覆蓋舊嘅
+    const resp = await fetch(SB_URL + '/rest/v1/schedules?on_conflict=employee_id,work_date', {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ employee_id: empId, project_id: projId, work_date: date })
+    });
+    if (!resp.ok) { const t = await resp.text(); throw new Error('HTTP ' + resp.status + ' — ' + t); }
+    toast('✅ 已排定 ' + empName(empId) + '　' + date);
+    document.getElementById('empSelect').value = '';
+    document.getElementById('projSelect').value = '';
+    updateAddState();
+    if (document.getElementById('filterDate').value === date) loadSchedules();
+  } catch (e) {
+    console.error('[ADD SCHEDULE]', e.message);
+    toast('❌ 排定失敗：' + e.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = '排定';
+    updateAddState();
+  }
+}
+
+function filterToday() {
+  document.getElementById('filterDate').value = hkToday();
+  loadSchedules();
+}
+
+async function loadSchedules() {
+  const date = document.getElementById('filterDate').value;
+  const box = document.getElementById('listBox');
+  document.getElementById('listTitle').textContent = '📅 排更列表　' + date;
+  box.innerHTML = '<div class="empty">載入中...</div>';
+  try {
+    const resp = await fetch(SB_URL + '/rest/v1/schedules?work_date=eq.' + date + '&select=id,employee_id,project_id,work_date&order=id.asc', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const rows = await resp.json();
+    if (!rows.length) { box.innerHTML = '<div class="empty">' + date + ' 尚未有排更紀錄</div>'; return; }
+
+    let html = '<table><thead><tr><th>員工</th><th>地盤</th><th>報更連結</th><th></th></tr></thead><tbody>';
+    rows.forEach(function(r) {
+      const link = location.origin + location.pathname.replace(/schedule.*$/, '') + '#emp=' + r.employee_id;
+      html += '<tr>' +
+        '<td><div class="emp-cell"><div class="avatar-sm" style="background:' + empColor(r.employee_id) + '33;color:' + empColor(r.employee_id) + '">' + empName(r.employee_id)[0] + '</div>' + empName(r.employee_id) + '</div></td>' +
+        '<td>' + projName(r.project_id) + '</td>' +
+        '<td class="link-cell"><button class="copy-btn" onclick="copyLink(\'' + r.employee_id + '\', this)">複製 checkin 連結</button></td>' +
+        '<td><button class="del-btn" onclick="delSchedule(' + r.id + ')">刪除</button></td>' +
+      '</tr>';
+    });
+    html += '</tbody></table>';
+    box.innerHTML = html;
+  } catch (e) {
+    console.error('[LOAD SCHEDULES]', e.message);
+    box.innerHTML = '<div class="empty">讀取失敗：' + e.message + '</div>';
+  }
+}
+
+function copyLink(empId, btn) {
+  const url = 'https://junhui-checkin.vercel.app/#emp=' + empId;
+  navigator.clipboard.writeText(url).then(function() {
+    const orig = btn.textContent;
+    btn.textContent = '已複製 ✓';
+    setTimeout(function() { btn.textContent = orig; }, 1500);
+  }).catch(function() { toast('複製失敗，請手動複製：' + url, true); });
+}
+
+async function delSchedule(id) {
+  if (!window.confirm('確定刪除呢筆排更？')) return;
+  try {
+    const resp = await fetch(SB_URL + '/rest/v1/schedules?id=eq.' + id, {
+      method: 'DELETE',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    toast('🗑 已刪除');
+    loadSchedules();
+  } catch (e) {
+    toast('❌ 刪除失敗', true);
+  }
+}
+
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+init();
+</script>
+</body>
+</html>

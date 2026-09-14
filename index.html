@@ -10,8 +10,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang HK',sans-serif;backg
 .company{font-size:17px;font-weight:700;color:#f0c000;text-align:center;margin-bottom:4px}
 .subtitle{font-size:12px;color:#555d6e;text-align:center;margin-bottom:24px}
 .card{background:#13161c;border:1px solid #1e2330;border-radius:14px;padding:20px;width:100%;max-width:420px;margin-bottom:14px}
-.badge{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:14px;background:#0d0f12;border-radius:10px;border:1px solid #2a3045}
+.badge{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px;background:#0d0f12;border-radius:10px;border:1px solid #2a3045}
 .avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0}
+.site-box{padding:12px 14px;background:#0d0f12;border-radius:10px;border:1px solid #2a3045;margin-bottom:14px}
+.site-name{font-size:14px;font-weight:700;color:#f0c000}
+.gps-status{font-size:12px;margin-top:6px}
 .lbl{display:block;font-size:11px;color:#9aa0b4;text-transform:uppercase;margin-bottom:6px;font-weight:600}
 .inp{width:100%;background:#0d0f12;border:1px solid #2a3045;border-radius:10px;color:#e8eaf0;font-size:16px;padding:12px 14px;outline:none;-webkit-appearance:none;margin-bottom:14px}
 .inp:focus{border-color:#f0c000}
@@ -28,6 +31,7 @@ textarea.inp{resize:none;height:80px}
 .row:last-child{border-bottom:none}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#e05c5c;color:#fff;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:999}
 .toast.show{opacity:1}
+.noassign{text-align:center;padding:50px 20px}
 </style>
 </head>
 <body>
@@ -41,6 +45,14 @@ textarea.inp{resize:none;height:80px}
   <div style="color:#555d6e;font-size:14px">請向主管索取正確嘅報更連結</div>
 </div>
 
+<div id="noassign" style="display:none;width:100%;max-width:420px">
+  <div class="card noassign">
+    <div style="font-size:44px;margin-bottom:14px">📭</div>
+    <div style="font-size:17px;font-weight:700;color:#e05c5c;margin-bottom:8px">今日未獲分配地盤</div>
+    <div style="color:#555d6e;font-size:13px">請聯絡主管確認今日工作地點</div>
+  </div>
+</div>
+
 <div id="main" style="display:none;width:100%;max-width:420px">
   <div class="card">
     <div class="badge">
@@ -50,8 +62,14 @@ textarea.inp{resize:none;height:80px}
         <div style="font-size:11px;color:#555d6e;margin-top:2px">電梯技工</div>
       </div>
     </div>
+
+    <div class="site-box">
+      <div class="site-name" id="siteName">📍 載入中...</div>
+      <div class="gps-status" id="gpsStatus" style="color:#9aa0b4">正在定位中，請允許位置權限⋯</div>
+    </div>
+
     <label class="lbl">日期</label>
-    <input type="date" class="inp" id="dt">
+    <input type="date" class="inp" id="dt" readonly>
     <label class="lbl">更期</label>
     <div class="shifts">
       <button class="shift" data-v="早更" onclick="sel(this)"><span class="shift-icon">🌅</span>早更</button>
@@ -98,64 +116,178 @@ const EMPLOYEES = [
   {id:52,name:"KK mario",phone:"96998241",color:"#FF6B1A"},
 ];
 
-// Robust emp ID extraction - handles ?emp=, #emp=, %23emp=
 var m = (location.search+location.hash+decodeURIComponent(location.href)).match(/emp=(\d+)/);
 var emp = m ? EMPLOYEES.find(function(e){return e.id===parseInt(m[1]);}) : null;
 var shift = null;
+var project = null;
+var gpsOK = false;
+var gpsCoords = null;
 
 if (!emp) {
   document.getElementById('err').style.display='block';
 } else {
-  document.getElementById('main').style.display='block';
   document.getElementById('nm').textContent=emp.name;
   var av=document.getElementById('av');
   av.textContent=emp.name[0];
   av.style.background=emp.color+'33';
   av.style.color=emp.color;
   av.style.border='2px solid '+emp.color+'66';
-  // HK date/time
   var hk=new Date(Date.now()+8*3600000);
-  document.getElementById('dt').value=hk.toISOString().slice(0,10);
+  var todayStr = hk.toISOString().slice(0,10);
+  document.getElementById('dt').value=todayStr;
   document.getElementById('tm').value=hk.toISOString().slice(11,16);
+  loadSchedule(todayStr);
+}
+
+async function loadSchedule(dateStr) {
+  try {
+    var url = SB_URL + '/rest/v1/schedules?employee_id=eq.' + emp.id + '&work_date=eq.' + dateStr + '&select=project_id';
+    var resp = await fetch(url, { headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY } });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var rows = await resp.json();
+    if (!rows.length || !rows[0].project_id) {
+      document.getElementById('noassign').style.display = 'block';
+      return;
+    }
+    var projResp = await fetch(SB_URL + '/rest/v1/projects?id=eq.' + rows[0].project_id + '&select=id,name,lat,lng,radius_m', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!projResp.ok) throw new Error('HTTP ' + projResp.status);
+    var projRows = await projResp.json();
+    if (!projRows.length) {
+      document.getElementById('noassign').style.display = 'block';
+      return;
+    }
+    project = projRows[0];
+    document.getElementById('main').style.display = 'block';
+    document.getElementById('siteName').textContent = '📍 ' + project.name;
+    startGPS();
+  } catch (e) {
+    console.error('[SCHEDULE]', e.message);
+    document.getElementById('err').style.display = 'block';
+  }
+}
+
+function haversineMeters(lat1, lng1, lat2, lng2) {
+  var R = 6371000;
+  function toRad(d){ return d * Math.PI / 180; }
+  var dLat = toRad(lat2 - lat1);
+  var dLng = toRad(lng2 - lng1);
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2) * Math.sin(dLng/2);
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function startGPS() {
+  var statusEl = document.getElementById('gpsStatus');
+
+  if (project.lat == null || project.lng == null) {
+    statusEl.innerHTML = '⚠️ 此地盤未設定座標，暫不需要位置驗證';
+    statusEl.style.color = '#9aa0b4';
+    gpsOK = true;
+    checkFormReady();
+    return;
+  }
+  if (!navigator.geolocation) {
+    statusEl.innerHTML = '❌ 此瀏覽器不支援定位功能，無法報更';
+    statusEl.style.color = '#e05c5c';
+    gpsOK = false;
+    checkFormReady();
+    return;
+  }
+  navigator.geolocation.watchPosition(
+    function(pos) {
+      gpsCoords = pos.coords;
+      var dist = Math.round(haversineMeters(pos.coords.latitude, pos.coords.longitude, project.lat, project.lng));
+      var radius = project.radius_m || 150;
+      gpsOK = dist <= radius;
+      if (gpsOK) {
+        statusEl.innerHTML = '✅ 已確認位於地盤範圍內（距離約 ' + dist + ' 米）';
+        statusEl.style.color = '#22c55e';
+      } else {
+        statusEl.innerHTML = '❌ 你距離地盤約 ' + dist + ' 米，超出範圍（' + radius + ' 米），無法報更';
+        statusEl.style.color = '#e05c5c';
+      }
+      checkFormReady();
+    },
+    function(err) {
+      gpsOK = false;
+      var msgs = {1:'你拒絕咗位置權限，請到瀏覽器設定允許後重新整理',2:'無法取得你嘅位置，請檢查定位服務是否開啟',3:'定位逾時，請重新整理再試'};
+      statusEl.innerHTML = '❌ ' + (msgs[err.code] || err.message);
+      statusEl.style.color = '#e05c5c';
+      checkFormReady();
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+  );
 }
 
 function sel(btn){
   document.querySelectorAll('.shift').forEach(function(b){b.classList.remove('sel');});
   btn.classList.add('sel'); shift=btn.dataset.v;
-  document.getElementById('sbtn').disabled=false;
+  checkFormReady();
+}
+
+function checkFormReady(){
+  document.getElementById('sbtn').disabled = !(shift && gpsOK);
 }
 
 function toast(msg){
   var t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},2500);
+  setTimeout(function(){t.classList.remove('show');},3000);
 }
 
 async function submit(){
   if(!shift){toast('請選擇更期');return;}
+  if(!gpsOK){toast('位置驗證未通過，無法報更');return;}
+
+  // 提交前最後一次核實
+  if (project.lat != null && project.lng != null && gpsCoords) {
+    var dist = Math.round(haversineMeters(gpsCoords.latitude, gpsCoords.longitude, project.lat, project.lng));
+    var radius = project.radius_m || 150;
+    if (dist > radius) {
+      gpsOK = false; checkFormReady();
+      toast('你已超出地盤範圍（約 ' + dist + ' 米），無法報更');
+      return;
+    }
+  }
+
   var btn=document.getElementById('sbtn');
   btn.disabled=true;btn.textContent='提交中...';
   var dt=document.getElementById('dt').value;
   var tm=document.getElementById('tm').value;
   var rmk=document.getElementById('rmk').value.trim();
   try{
+    var body = {
+      employee_name:emp.name,
+      date:dt,
+      shift_type:shift,
+      clock_in:dt+'T'+tm+':00+08:00',
+      notes:rmk||null,
+      status:'present',
+      project_id: project.id
+    };
+    if (gpsCoords) {
+      body.submit_lat = gpsCoords.latitude;
+      body.submit_lng = gpsCoords.longitude;
+    }
     var r=await fetch(SB_URL+'/rest/v1/attendance',{
       method:'POST',
       headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({employee_name:emp.name,date:dt,shift_type:shift,clock_in:dt+'T'+tm+':00+08:00',notes:rmk||null,status:'present'})
+      body:JSON.stringify(body)
     });
-    if(!r.ok)throw new Error();
+    if(!r.ok){ var t = await r.text(); throw new Error(t); }
     document.getElementById('main').style.display='none';
     document.getElementById('done').style.display='block';
-    var labels={'早更':'早更','夜更':'夜更','假日更':'假日更','散工':'散工'};
     document.getElementById('sumbox').innerHTML=
       '<div class="row"><span style="color:#555d6e">姓名</span><span style="font-weight:600">'+emp.name+'</span></div>'+
+      '<div class="row"><span style="color:#555d6e">地盤</span><span style="font-weight:600">'+project.name+'</span></div>'+
       '<div class="row"><span style="color:#555d6e">日期</span><span style="font-weight:600">'+dt+'</span></div>'+
       '<div class="row"><span style="color:#555d6e">更期</span><span style="font-weight:600">'+shift+'</span></div>'+
       '<div class="row"><span style="color:#555d6e">上班時間</span><span style="font-weight:600">'+tm+'</span></div>'+
       (rmk?'<div class="row"><span style="color:#555d6e">備註</span><span style="font-weight:600">'+rmk+'</span></div>':'');
   }catch(e){
     btn.disabled=false;btn.textContent='確認報更';
+    console.error('[SUBMIT]', e.message);
     toast('提交失敗，請重試');
   }
 }
